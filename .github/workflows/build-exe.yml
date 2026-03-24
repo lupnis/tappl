@@ -1,0 +1,84 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-windows-exe:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv and pin CPython 3.14t
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.14t"
+          enable-cache: true
+          cache-python: true
+
+      - name: Resolve release metadata
+        id: meta
+        shell: bash
+        run: |
+          uv run -p 3.14t --no-project python - <<'PY'
+          from pathlib import Path
+          import os
+          import re
+
+          version_file = Path("src/tap_player/_version.py").read_text(encoding="utf-8")
+          match = re.search(r'__version__\s*=\s*"([^"]+)"', version_file)
+          if not match:
+              raise SystemExit("Could not find __version__ in src/tap_player/_version.py")
+
+          version = match.group(1)
+          ref_name = os.environ.get("GITHUB_REF_NAME", "")
+          if ref_name.startswith("v") and ref_name.removeprefix("v") != version:
+              raise SystemExit(
+                  f"Tag version {ref_name.removeprefix('v')!r} does not match package version {version!r}"
+              )
+
+          asset_name = f"tappl-windows-x64-v{version}.zip"
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"version={version}\n")
+              output.write(f"asset_name={asset_name}\n")
+          print(f"Resolved version: {version}")
+          print(f"Asset name: {asset_name}")
+          PY
+
+      - name: Sync project with uv-managed CPython 3.14t
+        run: uv sync --locked --extra dev -p 3.14t
+
+      - name: Build standalone executable
+        run: uv run -p 3.14t --with pyinstaller pyinstaller --noconfirm --clean tap.spec
+
+      - name: Smoke test executable
+        run: .\dist\tappl.exe --help
+
+      - name: Package release archive
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force release | Out-Null
+          Copy-Item dist\tappl.exe release\
+          Copy-Item README.md release\
+          Copy-Item LICENSE release\
+          Compress-Archive -Path release\* -DestinationPath "${{ steps.meta.outputs.asset_name }}" -Force
+
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-exe-${{ steps.meta.outputs.version }}
+          path: ${{ steps.meta.outputs.asset_name }}
+
+      - name: Attach executable to GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.meta.outputs.asset_name }}
+          generate_release_notes: true

@@ -1,0 +1,34 @@
+name: Feature request
+description: Suggest an improvement for TAP
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing an idea. Clear problem statements help a lot.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      placeholder: I want to ...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      placeholder: TAP could support ...
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      placeholder: I also considered ...
+  - type: textarea
+    id: context
+    attributes:
+      label: Extra context
+      placeholder: Workflows, mockups, examples, or constraints

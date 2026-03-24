@@ -1,0 +1,73 @@
+name: Bug report
+description: Report a reproducible problem in TAP
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a TAP bug. Please include enough detail for us to reproduce it.
+  - type: input
+    id: version
+    attributes:
+      label: TAP version
+      description: Output from `tap --help` install context or the package version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: terminal
+    attributes:
+      label: Terminal
+      description: Terminal app and version if known
+      placeholder: Windows Terminal 1.x / iTerm2 / GNOME Terminal
+  - type: dropdown
+    id: backend
+    attributes:
+      label: Decode backend
+      options:
+        - auto
+        - miniaudio
+        - ffmpeg
+        - unknown
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run `tap --files ...`
+        2. Press ...
+        3. See error ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs, screenshots, or terminal output
+      render: text

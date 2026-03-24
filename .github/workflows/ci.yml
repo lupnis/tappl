@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  build-and-smoke-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv and pin CPython 3.14t
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.14t"
+          enable-cache: true
+          cache-python: true
+
+      - name: Sync project with uv-managed CPython 3.14t
+        run: uv sync --locked --extra dev -p 3.14t
+
+      - name: Byte-compile sources
+        run: uv run -p 3.14t python -m compileall main.py src/tap_player
+
+      - name: Build distribution
+        run: uv run -p 3.14t python -m build
+
+      - name: Smoke test console script
+        run: uv run -p 3.14t tappl --help
+
+      - name: Smoke test module entry point
+        run: uv run -p 3.14t python -m tappl --help
