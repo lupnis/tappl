@@ -32,10 +32,10 @@ jobs:
           import os
           import re
 
-          version_file = Path("src/tap_player/_version.py").read_text(encoding="utf-8")
+          version_file = Path("src/tappl/_version.py").read_text(encoding="utf-8")
           match = re.search(r'__version__\\s*=\\s*"([^"]+)"', version_file)
           if not match:
-              raise SystemExit("Could not find __version__ in src/tap_player/_version.py")
+              raise SystemExit("Could not find __version__ in src/tappl/_version.py")
           package_version = match.group(1)
           tag_version = os.environ["GITHUB_REF_NAME"].removeprefix("v")
           if package_version != tag_version:

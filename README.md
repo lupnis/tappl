@@ -173,7 +173,7 @@ uv sync --extra dev
 Useful commands:
 
 ```bash
-uv run python -m py_compile main.py src/tap_player/app.py
+uv run python -m py_compile main.py src/tappl/app.py
 uv run --extra dev python -m build
 uv run tappl --help
 uv run python -m tappl --help
@@ -185,7 +185,7 @@ For CI, releases, and local `uv` workflows, prefer the pinned free-threaded CPyt
 ## Project Layout
 
 ```text
-src/tap_player/     Python package
+src/tappl/          Python package
 main.py             local compatibility launcher
 .github/            issue templates and GitHub Actions
 README.md           project overview and usage
@@ -200,7 +200,7 @@ TAP ships with GitHub Actions for CI, PyPI publishing, and Windows executable pa
 
 For a release:
 
-1. Update `src/tap_player/_version.py`.
+1. Update `src/tappl/_version.py`.
 2. Commit the change.
 3. Create and push a tag like `v0.1.0`.
 4. The publish workflow builds the Python distribution and uploads it to PyPI.
