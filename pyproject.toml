@@ -3,7 +3,7 @@ requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tappl"
+name = "tapplayer"
 description = "TAP: Terminal Audio Player"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.14"
@@ -34,11 +34,12 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "build>=1.2.2",
+    "pyproject-hooks>=1.2.0",
     "twine>=6.1.0",
 ]
 
 [project.scripts]
-tappl = "tappl:main"
+tapplayer = "tapplayer:main"
 
 [tool.setuptools]
 include-package-data = true
@@ -50,4 +51,4 @@ include-package-data = true
 where = ["src"]
 
 [tool.setuptools.dynamic]
-version = { attr = "tappl._version.__version__" }
+version = { attr = "tapplayer._version.__version__" }

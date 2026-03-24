@@ -33,13 +33,13 @@ jobs:
         run: uv sync --locked --extra dev -p 3.14t
 
       - name: Byte-compile sources
-        run: uv run -p 3.14t python -m compileall main.py src/tappl
+        run: uv run -p 3.14t python -m compileall main.py src/tapplayer src/tappl
 
       - name: Build distribution
         run: uv run -p 3.14t python -m build
 
       - name: Smoke test console script
-        run: uv run -p 3.14t tappl --help
+        run: uv run -p 3.14t tapplayer --help
 
       - name: Smoke test module entry point
-        run: uv run -p 3.14t python -m tappl --help
+        run: uv run -p 3.14t python -m tapplayer --help

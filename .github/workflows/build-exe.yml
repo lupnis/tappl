@@ -32,10 +32,10 @@ jobs:
           import os
           import re
 
-          version_file = Path("src/tappl/_version.py").read_text(encoding="utf-8")
+          version_file = Path("src/tapplayer/_version.py").read_text(encoding="utf-8")
           match = re.search(r'__version__\s*=\s*"([^"]+)"', version_file)
           if not match:
-              raise SystemExit("Could not find __version__ in src/tappl/_version.py")
+              raise SystemExit("Could not find __version__ in src/tapplayer/_version.py")
 
           version = match.group(1)
           ref_name = os.environ.get("GITHUB_REF_NAME", "")
@@ -44,7 +44,7 @@ jobs:
                   f"Tag version {ref_name.removeprefix('v')!r} does not match package version {version!r}"
               )
 
-          asset_name = f"tappl-windows-x64-v{version}.zip"
+          asset_name = f"tapplayer-windows-x64-v{version}.zip"
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
               output.write(f"version={version}\n")
               output.write(f"asset_name={asset_name}\n")
@@ -59,13 +59,13 @@ jobs:
         run: uv run -p 3.14t --with pyinstaller pyinstaller --noconfirm --clean tap.spec
 
       - name: Smoke test executable
-        run: .\dist\tappl.exe --help
+        run: .\dist\tapplayer.exe --help
 
       - name: Package release archive
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force release | Out-Null
-          Copy-Item dist\tappl.exe release\
+          Copy-Item dist\tapplayer.exe release\
           Copy-Item README.md release\
           Copy-Item LICENSE release\
           Compress-Archive -Path release\* -DestinationPath "${{ steps.meta.outputs.asset_name }}" -Force

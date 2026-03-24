@@ -6,7 +6,7 @@ Thanks for helping improve TAP.
 
 ```bash
 uv sync --extra dev
-uv run tappl --help
+uv run tapplayer --help
 ```
 
 If you want to use the local compatibility launcher:
@@ -20,9 +20,9 @@ uv run python main.py --help
 Please make sure the following commands succeed:
 
 ```bash
-uv run python -m py_compile main.py src/tappl/app.py
+uv run python -m py_compile main.py src/tapplayer/__init__.py src/tapplayer/__main__.py src/tapplayer/_version.py src/tappl/app.py
 uv run --extra dev python -m build
-uv run tappl --help
+uv run tapplayer --help
 ```
 
 ## Guidelines
@@ -48,7 +48,7 @@ Releases are published from Git tags through GitHub Actions.
 
 To cut a release:
 
-1. Update `src/tappl/_version.py`.
+1. Update `src/tapplayer/_version.py`.
 2. Commit the version bump.
 3. Push a tag like `v0.1.0`.
 4. Wait for the publish workflow to upload the package to PyPI.

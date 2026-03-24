@@ -901,7 +901,7 @@ class SyncMixer:
                 nchannels=self.channels,
                 sample_rate=self.sample_rate,
                 buffersize_msec=self.buffer_size_msec,
-                app_name="tappl",
+                app_name="tapplayer",
             )
             self._generator = self._playback_stream()
             next(self._generator)

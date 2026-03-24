@@ -16,28 +16,28 @@ It can scan folders and files from the command line, render a tree-style library
 - solo and together strategy families with runtime switching
 - optional `ffmpeg` backend with automatic fallback to `miniaudio`
 - keyboard-first controls for Windows, Linux, and macOS
-- publishable Python package with a `tappl` command
+- publishable Python package with a `tapplayer` command
 
 ## Installation
 
 Install from PyPI:
 
 ```bash
-pip install tappl
+pip install tapplayer
 ```
 
 Then run:
 
 ```bash
-tappl --help
-python -m tappl --help
+tapplayer --help
+python -m tapplayer --help
 ```
 
 If you prefer isolated CLI installs:
 
 ```bash
-pipx install tappl
-tappl --help
+pipx install tapplayer
+tapplayer --help
 ```
 
 Install from source:
@@ -46,7 +46,7 @@ Install from source:
 git clone <your-repo-url>
 cd tap
 uv sync --extra dev
-uv run tappl --help
+uv run tapplayer --help
 ```
 
 For local development, the compatibility launcher still works:
@@ -62,30 +62,30 @@ TAP pins `uv` to free-threaded CPython `3.14t` via [`.python-version`](.python-v
 TAP also ships with a GitHub Actions workflow that builds a standalone Windows executable.
 
 - Run the `Build Windows EXE` workflow manually to get a downloadable Actions artifact.
-- Push a version tag like `v0.1.0` to build `tappl.exe` and attach a `.zip` archive to the GitHub release.
-- The archive contains `tappl.exe`, `README.md`, and `LICENSE`.
+- Push a version tag like `v0.1.0` to build `tapplayer.exe` and attach a `.zip` archive to the GitHub release.
+- The archive contains `tapplayer.exe`, `README.md`, and `LICENSE`.
 - The workflow builds with uv-managed free-threaded CPython `3.14t`.
 
 To build the executable locally on Windows:
 
 ```bash
 uv run --with pyinstaller pyinstaller --noconfirm --clean tap.spec
-dist/tappl.exe --help
+dist/tapplayer.exe --help
 ```
 
 ## Quick Start
 
 ```bash
-tappl --files "~/Music/Drums" "~/Music/bass.wav" --strategy together --time auto-max
+tapplayer --files "~/Music/Drums" "~/Music/bass.wav" --strategy together --time auto-max
 ```
 
 Common examples:
 
 ```bash
-tappl --files ./stems ./vox.wav
-tappl --files ./album --generic-mode solo --strategy playlist-once
-tappl --files ./stems --decode-backend auto
-tappl --files ./stems --arrow-mode hjkl
+tapplayer --files ./stems ./vox.wav
+tapplayer --files ./album --generic-mode solo --strategy playlist-once
+tapplayer --files ./stems --decode-backend auto
+tapplayer --files ./stems --arrow-mode hjkl
 ```
 
 ## Features
@@ -141,7 +141,7 @@ Actual decode support depends on the active backend. `ffmpeg` generally handles 
 - `--disable-strategy-change`
 - `--disable-list-modify`
 
-Run `tappl --help` for the full argument list.
+Run `tapplayer --help` for the full argument list.
 
 ## Runtime Controls
 
@@ -173,10 +173,10 @@ uv sync --extra dev
 Useful commands:
 
 ```bash
-uv run python -m py_compile main.py src/tappl/app.py
+uv run python -m py_compile main.py src/tapplayer/__init__.py src/tapplayer/__main__.py src/tapplayer/_version.py src/tappl/app.py
 uv run --extra dev python -m build
-uv run tappl --help
-uv run python -m tappl --help
+uv run tapplayer --help
+uv run python -m tapplayer --help
 ```
 
 Please keep changes cross-platform when possible. Avoid introducing Windows-only dependencies unless they are fully guarded and optional.
@@ -185,7 +185,7 @@ For CI, releases, and local `uv` workflows, prefer the pinned free-threaded CPyt
 ## Project Layout
 
 ```text
-src/tappl/          Python package
+src/tapplayer/      Public Python package entrypoint
 main.py             local compatibility launcher
 .github/            issue templates and GitHub Actions
 README.md           project overview and usage
@@ -200,11 +200,11 @@ TAP ships with GitHub Actions for CI, PyPI publishing, and Windows executable pa
 
 For a release:
 
-1. Update `src/tappl/_version.py`.
+1. Update `src/tapplayer/_version.py`.
 2. Commit the change.
 3. Create and push a tag like `v0.1.0`.
 4. The publish workflow builds the Python distribution and uploads it to PyPI.
-5. The Windows EXE workflow builds `tappl.exe`, uploads a workflow artifact, and attaches a release archive on tag builds.
+5. The Windows EXE workflow builds `tapplayer.exe`, uploads a workflow artifact, and attaches a release archive on tag builds.
 6. All release automation runs on uv-managed free-threaded CPython `3.14t`.
 
 The PyPI workflow is configured for Trusted Publishing. Before the first release, configure your PyPI project to trust this GitHub repository and workflow.

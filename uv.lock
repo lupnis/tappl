@@ -459,7 +459,7 @@ wheels = [
 ]
 
 [[package]]
-name = "tappl"
+name = "tapplayer"
 source = { editable = "." }
 dependencies = [
     { name = "miniaudio" },
@@ -470,6 +470,7 @@ dependencies = [
 [package.optional-dependencies]
 dev = [
     { name = "build" },
+    { name = "pyproject-hooks" },
     { name = "twine" },
 ]
 
@@ -478,6 +479,7 @@ requires-dist = [
     { name = "build", marker = "extra == 'dev'", specifier = ">=1.2.2" },
     { name = "miniaudio", specifier = ">=1.61" },
     { name = "numpy", specifier = ">=2.4.3" },
+    { name = "pyproject-hooks", marker = "extra == 'dev'", specifier = ">=1.2.0" },
     { name = "rich", specifier = ">=14.3.3" },
     { name = "twine", marker = "extra == 'dev'", specifier = ">=6.1.0" },
 ]
