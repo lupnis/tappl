@@ -33,7 +33,7 @@ jobs:
           import re
 
           version_file = Path("src/tappl/_version.py").read_text(encoding="utf-8")
-          match = re.search(r'__version__\\s*=\\s*"([^"]+)"', version_file)
+          match = re.search(r'__version__\s*=\s*"([^"]+)"', version_file)
           if not match:
               raise SystemExit("Could not find __version__ in src/tappl/_version.py")
           package_version = match.group(1)
