@@ -21,7 +21,7 @@ Please make sure the following commands succeed:
 
 ```bash
 uv run python -m py_compile main.py src/tapplayer/__init__.py src/tapplayer/__main__.py src/tapplayer/_version.py src/tappl/app.py
-uv run --extra dev python -m build
+uv run -p 3.14t --with build --with pyproject-hooks pyproject-build
 uv run tapplayer --help
 ```
 
@@ -50,7 +50,7 @@ To cut a release:
 
 1. Update `src/tapplayer/_version.py`.
 2. Commit the version bump.
-3. Push a tag like `v0.1.0`.
+3. Push a tag like `v0.2.0`.
 4. Wait for the publish workflow to upload the package to PyPI.
 
 The repository should be configured as a Trusted Publisher in PyPI before the first release.

@@ -44,7 +44,7 @@ jobs:
           PY
 
       - name: Build distribution
-        run: uv run -p 3.14t python -m build
+        run: uv run -p 3.14t --with build --with pyproject-hooks pyproject-build
 
       - name: Check distribution metadata
         run: uv run -p 3.14t python -m twine check dist/*

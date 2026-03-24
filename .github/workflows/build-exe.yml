@@ -1,4 +1,4 @@
-name: Build Windows EXE
+name: Build Platform Binaries
 
 on:
   workflow_dispatch:
@@ -7,8 +7,21 @@ on:
       - "v*"
 
 jobs:
-  build-windows-exe:
-    runs-on: windows-latest
+  build-platform-binary:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform_id: windows
+            archive_ext: zip
+          - os: ubuntu-latest
+            platform_id: linux
+            archive_ext: tar.gz
+          - os: macos-latest
+            platform_id: macos
+            archive_ext: tar.gz
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: write
 
@@ -44,13 +57,29 @@ jobs:
                   f"Tag version {ref_name.removeprefix('v')!r} does not match package version {version!r}"
               )
 
-          asset_name = f"tapplayer-windows-x64-v{version}.zip"
+          platform_id = os.environ["PLATFORM_ID"]
+          archive_ext = os.environ["ARCHIVE_EXT"]
+          runner_arch = os.environ.get("RUNNER_ARCH", "X64").lower()
+          arch = {
+              "x64": "x64",
+              "arm64": "arm64",
+              "x86": "x86",
+          }.get(runner_arch, runner_arch)
+          suffix = ".zip" if archive_ext == "zip" else ".tar.gz"
+          binary_name = "tapplayer.exe" if platform_id == "windows" else "tapplayer"
+          asset_name = f"tapplayer-{platform_id}-{arch}-v{version}{suffix}"
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
               output.write(f"version={version}\n")
+              output.write(f"arch={arch}\n")
+              output.write(f"binary_name={binary_name}\n")
               output.write(f"asset_name={asset_name}\n")
           print(f"Resolved version: {version}")
           print(f"Asset name: {asset_name}")
           PY
+        env:
+          PLATFORM_ID: ${{ matrix.platform_id }}
+          ARCHIVE_EXT: ${{ matrix.archive_ext }}
+          RUNNER_ARCH: ${{ runner.arch }}
 
       - name: Sync project with uv-managed CPython 3.14t
         run: uv sync --locked --extra dev -p 3.14t
@@ -58,27 +87,58 @@ jobs:
       - name: Build standalone executable
         run: uv run -p 3.14t --with pyinstaller pyinstaller --noconfirm --clean tap.spec
 
-      - name: Smoke test executable
-        run: .\dist\tapplayer.exe --help
+      - name: Smoke test executable on Windows
+        if: matrix.platform_id == 'windows'
+        run: .\dist\${{ steps.meta.outputs.binary_name }} --help
 
-      - name: Package release archive
+      - name: Smoke test executable on Unix
+        if: matrix.platform_id != 'windows'
+        shell: bash
+        run: ./dist/${{ steps.meta.outputs.binary_name }} --help
+
+      - name: Package release archive on Windows
+        if: matrix.platform_id == 'windows'
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force release | Out-Null
-          Copy-Item dist\tapplayer.exe release\
+          Copy-Item "dist\${{ steps.meta.outputs.binary_name }}" release\
           Copy-Item README.md release\
           Copy-Item LICENSE release\
           Compress-Archive -Path release\* -DestinationPath "${{ steps.meta.outputs.asset_name }}" -Force
 
-      - name: Upload executable artifact
+      - name: Package release archive on Unix
+        if: matrix.platform_id != 'windows'
+        shell: bash
+        run: |
+          mkdir -p release
+          cp "dist/${{ steps.meta.outputs.binary_name }}" release/
+          cp README.md release/
+          cp LICENSE release/
+          tar -C release -czf "${{ steps.meta.outputs.asset_name }}" .
+
+      - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-exe-${{ steps.meta.outputs.version }}
+          name: platform-binary-${{ matrix.platform_id }}-${{ steps.meta.outputs.arch }}-${{ steps.meta.outputs.version }}
           path: ${{ steps.meta.outputs.asset_name }}
 
-      - name: Attach executable to GitHub release
-        if: startsWith(github.ref, 'refs/tags/v')
+  publish-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-platform-binary
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download binary artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: platform-binary-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Attach binaries to GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ steps.meta.outputs.asset_name }}
+          files: release-assets/*
           generate_release_notes: true

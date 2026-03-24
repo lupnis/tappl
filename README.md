@@ -2,9 +2,11 @@
 
 > <font color="red">This is a pure vibe-coding project, thus might be hard to maintain XOX</font>
 
-> <font color="red">This project has only been tested on Windows yet.</font>
+> <font color="red">Interactive runtime testing is still strongest on Windows, although release binaries are now built for Windows, Linux, and macOS.</font>
 
 TAP is a Rich-based terminal audio player built for fast keyboard control, synchronized multi-track playback, and terminal-first workflows.
+
+![screenshot](res/screenshot.png)
 
 It can scan folders and files from the command line, render a tree-style library view, switch between solo and together playback strategies, and optionally use `ffmpeg` as the decode backend.
 
@@ -55,23 +57,28 @@ For local development, the compatibility launcher still works:
 uv run python main.py --help
 ```
 
-TAP pins `uv` to free-threaded CPython `3.14t` via [`.python-version`](.python-version). CI, PyPI builds, and Windows EXE releases are all expected to run on that interpreter variant.
+TAP pins `uv` to free-threaded CPython `3.14t` via [`.python-version`](.python-version). CI, PyPI builds, and release binaries for Windows, Linux, and macOS are all expected to run on that interpreter variant.
 
-## Windows EXE
+## Platform Binaries
 
-TAP also ships with a GitHub Actions workflow that builds a standalone Windows executable.
+TAP also ships with a GitHub Actions workflow that builds standalone release binaries for Windows, Linux, and macOS.
 
-- Run the `Build Windows EXE` workflow manually to get a downloadable Actions artifact.
-- Push a version tag like `v0.1.0` to build `tapplayer.exe` and attach a `.zip` archive to the GitHub release.
-- The archive contains `tapplayer.exe`, `README.md`, and `LICENSE`.
+- Run the `Build Platform Binaries` workflow manually to get downloadable Actions artifacts.
+- Push a version tag like `v0.2.0` to build release archives for all three platforms and attach them to the GitHub release.
+- Windows ships as `tapplayer-windows-<arch>-v0.2.0.zip` with `tapplayer.exe`.
+- Linux ships as `tapplayer-linux-<arch>-v0.2.0.tar.gz` with `tapplayer`.
+- macOS ships as `tapplayer-macos-<arch>-v0.2.0.tar.gz` with `tapplayer`.
+- Every archive contains the binary plus `README.md` and `LICENSE`.
 - The workflow builds with uv-managed free-threaded CPython `3.14t`.
 
-To build the executable locally on Windows:
+To build the standalone binary locally:
 
 ```bash
 uv run --with pyinstaller pyinstaller --noconfirm --clean tap.spec
-dist/tapplayer.exe --help
+dist/tapplayer --help
 ```
+
+On Windows, the output file is `dist/tapplayer.exe`.
 
 ## Quick Start
 
@@ -174,7 +181,7 @@ Useful commands:
 
 ```bash
 uv run python -m py_compile main.py src/tapplayer/__init__.py src/tapplayer/__main__.py src/tapplayer/_version.py src/tappl/app.py
-uv run --extra dev python -m build
+uv run -p 3.14t --with build --with pyproject-hooks pyproject-build
 uv run tapplayer --help
 uv run python -m tapplayer --help
 ```
@@ -186,6 +193,7 @@ For CI, releases, and local `uv` workflows, prefer the pinned free-threaded CPyt
 
 ```text
 src/tapplayer/      Public Python package entrypoint
+src/tappl/          Internal implementation package
 main.py             local compatibility launcher
 .github/            issue templates and GitHub Actions
 README.md           project overview and usage
@@ -202,9 +210,9 @@ For a release:
 
 1. Update `src/tapplayer/_version.py`.
 2. Commit the change.
-3. Create and push a tag like `v0.1.0`.
+3. Create and push a tag like `v0.2.0`.
 4. The publish workflow builds the Python distribution and uploads it to PyPI.
-5. The Windows EXE workflow builds `tapplayer.exe`, uploads a workflow artifact, and attaches a release archive on tag builds.
+5. The platform binary workflow builds `tapplayer.exe` on Windows plus `tapplayer` archives for Linux and macOS, uploads workflow artifacts, and attaches them on tag builds.
 6. All release automation runs on uv-managed free-threaded CPython `3.14t`.
 
 The PyPI workflow is configured for Trusted Publishing. Before the first release, configure your PyPI project to trust this GitHub repository and workflow.

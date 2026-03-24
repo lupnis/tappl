@@ -36,7 +36,7 @@ jobs:
         run: uv run -p 3.14t python -m compileall main.py src/tapplayer src/tappl
 
       - name: Build distribution
-        run: uv run -p 3.14t python -m build
+        run: uv run -p 3.14t --with build --with pyproject-hooks pyproject-build
 
       - name: Smoke test console script
         run: uv run -p 3.14t tapplayer --help
