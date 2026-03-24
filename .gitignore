@@ -17,6 +17,3 @@ wheels/
 .DS_Store
 .idea/
 .vscode/
-
-# build spec
-*.spec
